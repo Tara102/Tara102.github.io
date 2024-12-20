@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ulang Tahun</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: lightblue;
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+
+        /* Kembang Api */
+        .fireworks {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            width: 15px;
+            height: 15px;
+            background-color: red;
+            border-radius: 50%;
+            animation: fireworkAnim 2s infinite;
+        }
+        @keyframes fireworkAnim {
+            0% { transform: translateX(0) translateY(0); opacity: 1; }
+            100% { transform: translateX(-200px) translateY(-100px); opacity: 0; }
+        }
+
+        /* Kembang Api Warna-Warni */
+        .firework-1 {
+            background-color: red;
+            animation: fireworkAnim1 1.5s infinite;
+        }
+        .firework-2 {
+            background-color: blue;
+            animation: fireworkAnim2 1.5s infinite;
+        }
+        .firework-3 {
+            background-color: green;
+            animation: fireworkAnim3 1.5s infinite;
+        }
+        .firework-4 {
+            background-color: yellow;
+            animation: fireworkAnim4 1.5s infinite;
+        }
+
+        @keyframes fireworkAnim1 {
+            0% { transform: translateX(0) translateY(0); opacity: 1; }
+            100% { transform: translateX(150px) translateY(-200px); opacity: 0; }
+        }
+
+        @keyframes fireworkAnim2 {
+            0% { transform: translateX(0) translateY(0); opacity: 1; }
+            100% { transform: translateX(-150px) translateY(-250px); opacity: 0; }
+        }
+
+        @keyframes fireworkAnim3 {
+            0% { transform: translateX(0) translateY(0); opacity: 1; }
+            100% { transform: translateX(200px) translateY(-150px); opacity: 0; }
+        }
+
+        @keyframes fireworkAnim4 {
+            0% { transform: translateX(0) translateY(0); opacity: 1; }
+            100% { transform: translateX(-200px) translateY(-100px); opacity: 0; }
+        }
+
+        /* Partikel */
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background-color: gold;
+            border-radius: 50%;
+            animation: particleAnim 1.5s infinite;
+        }
+        @keyframes particleAnim {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-50px); }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="birthdayCanvas" width="400" height="400"></canvas>
+    
+    <!-- Audio untuk lagu Happy Birthday -->
+    <audio id="birthdaySong" src="happy-birthday-266285.mp3" preload="auto"></audio>
+
+    <!-- Kembang Api -->
+    <div class="fireworks firework-1"></div>
+    <div class="fireworks firework-2"></div>
+    <div class="fireworks firework-3"></div>
+    <div class="fireworks firework-4"></div>
+
+    <!-- Partikel -->
+    <div class="particle" style="top: 50px; left: 100px;"></div>
+    <div class="particle" style="top: 100px; left: 200px;"></div>
+    <div class="particle" style="top: 150px; left: 300px;"></div>
+
+    <script>
+        const canvas = document.getElementById("birthdayCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let candleX1 = 180, candleX2 = 195, candleX3 = 210; // Posisi lilin
+        let textY = 320; // Posisi teks
+        let textDirection = 0; // Arah pergerakan teks
+        let typedText = ""; // Teks yang sedang diketik
+        let message1 = "Happy Birthday Araa!!!";
+        let message2 = "Sehat Sehat yaa raa!❤️";
+        let index1 = 0;
+        let index2 = 0;
+
+        let candlesAlive = true; // Status apakah lilin masih menyala
+        let candleExtinguished = false; // Menandakan apakah lilin sudah dipadamkan
+
+        // Fungsi untuk memutar lagu Happy Birthday
+        function playBirthdaySong() {
+            const song = document.getElementById("birthdaySong");
+            song.play(); // Memulai pemutaran lagu
+        }
+
+        // Fungsi untuk menggambar persegi panjang (lapisan kue)
+        function drawRectangle(x, y, width, height, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, width, height);
+        }
+
+        // Fungsi untuk menggambar lilin
+        function drawCandle(x, y, flameOpacity) {
+            // Badan lilin
+            ctx.fillStyle = "white";
+            ctx.fillRect(x, y, 10, 20);
+
+            // Jika lilin hidup dan belum dipadamkan
+            if (candlesAlive && !candleExtinguished) {
+                // Api lilin dengan opasitas (untuk efek kelap-kelip)
+                ctx.beginPath();
+                ctx.arc(x + 5, y - 5, 5, 0, Math.PI * 2);
+                ctx.fillStyle = "orange";
+                ctx.globalAlpha = flameOpacity; // Mengubah transparansi api lilin
+                ctx.fill();
+                ctx.globalAlpha = 1; // Reset opasitas ke normal setelah menggambar
+            }
+        }
+
+        // Fungsi untuk menggambar teks
+        function drawText() {
+            ctx.font = "24px Times New Roman";
+            ctx.fillStyle = "black";
+            ctx.textAlign = "center";
+            ctx.fillText(typedText, 200, textY);
+        }
+
+        // Fungsi untuk menggambar semua elemen
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Bersihkan canvas setiap frame
+
+            // Gambar kue
+            drawRectangle(150, 250, 100, 50, "red");     // Lapisan bawah
+            drawRectangle(160, 210, 80, 40, "yellow");   // Lapisan tengah
+            drawRectangle(170, 170, 60, 40, "green");    // Lapisan atas
+
+            // Gambar lilin dengan efek kelap-kelip
+            let flameOpacity = Math.random() * 0.5 + 0.5; // Opasitas api lilin (antara 0.5 dan 1)
+            drawCandle(candleX1, 150, flameOpacity);  // Lilin pertama
+            drawCandle(candleX2, 150, flameOpacity);  // Lilin kedua
+            drawCandle(candleX3, 150, flameOpacity);  // Lilin ketiga
+
+            // Tampilkan teks yang sedang diketik
+            if (index1 < message1.length) {
+                typedText = message1.slice(0, index1 + 1);
+                index1++;
+            }
+
+            // Tampilkan pesan kedua setelah yang pertama selesai
+            if (index1 === message1.length && index2 < message2.length) {
+                typedText = message2.slice(0, index2 + 1);
+                index2++;
+            }
+
+            // Gambar teks dengan animasi mengetik
+            drawText();
+
+            // Memeriksa apakah kedua pesan telah selesai
+            if (index1 === message1.length && index2 === message2.length) {
+                setTimeout(function() {
+                    if (confirm("Sekali Lagi Selamat Ulang Tahun Araa! 🎉")) { // Menampilkan pop-up peringatan
+                        if (!candleExtinguished) {
+                            candleExtinguished = true; // Menandakan lilin sudah dipadamkan
+                            candlesAlive = false; // Padamkan lilin
+                        }
+                        playBirthdaySong(); // Memulai lagu Happy Birthday
+                    }
+                }, 500); // Menunggu setengah detik sebelum menampilkan alert
+            }
+
+            // Animasi teks bergerak naik turun
+            textY += textDirection;
+            if (textY > 330 || textY < 310) textDirection *= -1;
+
+            // Memanggil fungsi draw() secara terus menerus
+            setTimeout(draw, 180); // Tambahkan delay agar efek mengetik lebih jelas
+        }
+
+        // Memulai animasi
+        draw();
+    </script>
+</body>
+</html>
